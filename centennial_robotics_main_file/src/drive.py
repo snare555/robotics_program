@@ -1,8 +1,12 @@
 #region VEXcode Generated Robot Configuration
 from vex import *
+import math
 
 # Brain should be defined by default
 brain=Brain()
+
+
+
 
 # Robot configuration code
 controller_1 = Controller(PRIMARY)
@@ -11,131 +15,146 @@ motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)
 motor_3 = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
 motor_4 = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)
 
+vision_1__OBJECT_1 = Signature(1, 4889, 6779, 5834,-1, 659, 329,3, 0)
+vision_1 = Vision(Ports.PORT6, 50, vision_1__OBJECT_1)
+
 
 # wait for rotation sensor to fully initialize
 wait(30, MSEC)
-#endregion VEXcode Generated Robot Configuration
 
+#endregion VEXcode Generated Robot Configuration
 # ------------------------------------------
-#
 #   Project:      VEXcode Project
 #   Author:       VEX
 #   Created:
 #   Description:  VEXcode V5 Python Project
-#
 # ------------------------------------------
 
-# Library imports
-from vex import *
-
 # Begin project code
-import math
 
-def input_calculation():
+class Drive():
 
-    # Get input signals from the controller and assign them to various variables
-    yaw_control_factor = controller_1.axis1.position() / 2
-    x_control_factor = controller_1.axis4.position() ** 3 / -100
-    y_control_factor = controller_1.axis3.position() ** 3 / 100
+    def __init__(self):
+        self.speeds = []
+        self.input = {
+            "axis_1":[0, 0],
+            "axis_2":[0, 0],
+            "axis_3":[0, 0],
+            "axis_4":[0, 0],
+        }
 
-    # The heading variable is the angle the robot travels at
+        self.location = (0, 0)
+        self.size = ()
 
-    # If the left analog stick is moved right
-    # and its either moved up or stays horizontal
-    if x_control_factor > 0 and y_control_factor >= 0:
-
-        #
-        heading = math.atan(y_control_factor/x_control_factor)
-
-    elif x_control_factor < 0 and y_control_factor >= 0:
-        heading = math.pi - math.atan(-y_control_factor/x_control_factor)
-
-    elif x_control_factor < 0 and y_control_factor < 0:
-        heading = math.atan(y_control_factor/x_control_factor) + math.pi
-
-    elif x_control_factor > 0 and y_control_factor < 0:
-        heading = 2 * math.pi - math.atan(-y_control_factor/x_control_factor)
-
-    elif x_control_factor == 0 and y_control_factor >= 0:
-        heading = 0.5 * math.pi
-
-    elif x_control_factor == 0 and y_control_factor < 0:
-        heading = 1.5 * math.pi
-
-    # Set a magnitude variable to whichever analog
-    # input component is greater
-    # (If we move the stick higher up than sideways) set the magnitude
-    # to the vertical component
-    if abs(y_control_factor) > abs(x_control_factor):
-        magnitude = abs(y_control_factor)
-    else:
-        magnitude = abs(x_control_factor)
-   
-    x_drive_factor = math.cos(heading - math.pi / 4)
-    y_drive_factor = math.sin(heading - math.pi / 4)
-
-    if abs(x_drive_factor) > abs(y_drive_factor):
-        diff = abs(y_drive_factor / x_drive_factor)
-        x_drive_factor = magnitude * x_drive_factor
-        y_drive_factor = magnitude * diff * y_drive_factor
-   
-    else:
-        diff = abs(x_drive_factor / y_drive_factor)
-        y_drive_factor = magnitude * y_drive_factor
-        x_drive_factor = magnitude * diff * x_drive_factor
-
-    motor_1_speed = y_drive_factor
-    motor_3_speed = - y_drive_factor
-    motor_2_speed = - x_drive_factor
-    motor_4_speed = x_drive_factor
-
-    motor_1_speed += yaw_control_factor
-    if motor_1_speed >= 100:
-        motor_1_speed = 100
-    elif motor_1_speed <= -100:
-        motor_1_speed = -100
-
-    motor_2_speed += yaw_control_factor
-    if motor_2_speed >= 100:
-        motor_2_speed = 100
-    elif motor_2_speed <= -100:
-        motor_2_speed = -100
-
-    motor_3_speed += yaw_control_factor
-    if motor_3_speed >= 100:
-        motor_3_speed = 100
-    elif motor_3_speed <= -100:
-        motor_3_speed = -100
-
-    motor_4_speed += yaw_control_factor
-    if motor_4_speed >= 100:
-        motor_4_speed = 100
-    elif motor_4_speed <= -100:
-        motor_4_speed = -100
+    def control_input(self):
+        self.axis[0] = controller_1.axis1.position()
+        self.axis[1] = controller_1.axis2.position()
+        self.axis[2] = controller_1.axis3.position()
+        self.axis[3] = controller_1.axis4.position()
 
 
+        # Add magnitudes to the input dictionary
+        direction = [0, 0, 0, 0]
+        for i in range(4):
+            if self.axis[i] != 0:
+                direction[i] = abs(self.axis[i])/self.axis[i]
+        self.input = {
+            "axis_1":[abs(self.axis[0]), direction[0]],
+            "axis_2":[abs(self.axis[1]), direction[1]],
+            "axis_3":[abs(self.axis[2]), direction[2]],
+            "axis_4":[abs(self.axis[3]), direction[3]],
+        }
 
-    return(motor_1_speed, motor_2_speed, motor_3_speed, motor_4_speed, magnitude, heading*180/math.pi, yaw_control_factor)
+    def control_input_modification(self, axis_1_cf = 1, axis_2_cf = 1, axis_3_cf = 1, axis_4_cf = 1):
 
-def motor_set():
-    speeds = input_calculation()
+        self.input["axis_1"][0] = (self.input["axis_1"][0]/10)**axis_1_cf
+        self.input["axis_2"][0] = (self.input["axis_2"][0]/10)**axis_2_cf
+        self.input["axis_3"][0] = (self.input["axis_3"][0]/10)**axis_3_cf
+        self.input["axis_4"][0] = (self.input["axis_4"][0]/10)**axis_4_cf
 
-   
-    motor_1.set_velocity(speeds[0]*2)
-    motor_2.set_velocity(speeds[1]*2)
-    motor_3.set_velocity(speeds[2]*2)
-    motor_4.set_velocity(speeds[3]*2)
+    def parallel_input_calculations(self):
+        # Iterate through the motors in a slice of the speeds index
+
+        init_speed = self.input["axis_3"][0] * self.input["axis_3"][1]
+        self.speeds = [init_speed for i in range(4)]
+        if self.input["axis_4"][0] != 0:
+            rotation = self.input["axis_4"][0] * self.input["axis_4"][1]
+            self.speeds[1] -= rotation
+            self.speeds[2] += rotation
+
+    def motor_speed(self):
+
+        motor_1.set_velocity(-self.speeds[0]*2)
+        motor_2.set_velocity(-self.speeds[1]*2)
+        motor_3.set_velocity(self.speeds[2]*2)
+        motor_4.set_velocity(self.speeds[3]*2)
+
+        motor_1.spin(FORWARD)
+        motor_2.spin(FORWARD)
+        motor_3.spin(FORWARD)
+        motor_4.spin(FORWARD)
+
+    def kill(self):
+        motor_1.set_velocity(0)
+        motor_2.set_velocity(0)
+        motor_3.set_velocity(0)
+        motor_4.set_velocity(0)
+
+        motor_1.spin(FORWARD)
+        motor_2.spin(FORWARD)
+        motor_3.spin(FORWARD)
+        motor_4.spin(FORWARD)
+
+
+    def vision_data_collect(self):
+        """
+        A function which will take in several pieces of information from
+        its surroundings. This data inckudes the location and size of the object
+        the robot is seeking
+        """
+        object = vision_1.take_snapshot(vision_1__OBJECT_1)
+        brain.screen.print("Taking picture")
+
+        if object is not None:
+            self.location = (vision_1.largest_object().centerX, vision_1.largest_object().centerY)
+
+            self.size = (vision_1.largest_object().width, vision_1.largest_object().height)
+
+    def autonomous_chase(self):
+        """A function that takes in visual data and outputs motor data to chases an object"""
+        
+        self.vision_data_collect()
+
+        if (self.location[0] * self.location[1]) > 495:
+            self.input["axis_3"] = [75, -1]
+        elif (self.location[0] * self.location[1]) < 473:
+            self.input["axis_3"] = [75, 1]
+        else:
+            self.input["axis_3"] = [0, 1]
 
 
 
-while True:
-    motor_set()
-    brain.screen.print(input_calculation())
-    wait(1/60,SECONDS)
-    brain.screen.clear_screen()
-    brain.screen.set_cursor(2,2)
+drive_program = Drive()
+def manual_drive():
+    while True:
+        drive_program.control_input()
+        drive_program.control_input_modification(axis_2_cf = 2, axis_3_cf=4)
+        drive_program.parallel_input_calculations()
+        brain.screen.print(drive_program.input)
+        drive_program.motor_speed()
+        wait(1/60,SECONDS)
+        brain.screen.clear_screen()
+        brain.screen.set_cursor(2,2)
 
-    motor_1.spin(FORWARD)
-    motor_2.spin(FORWARD)
-    motor_3.spin(FORWARD)
-    motor_4.spin(FORWARD)
+def automatic_drive():
+    while True:
+        drive_program.autonomous_chase()
+        drive_program.parallel_input_calculations()
+        brain.screen.print(drive_program.input["axis_3"])
+        brain.screen.print(drive_program.size)
+        drive_program.motor_speed()
+        wait(1/60,SECONDS)
+        brain.screen.clear_screen()
+        brain.screen.set_cursor(2,2)
+
+automatic_drive()

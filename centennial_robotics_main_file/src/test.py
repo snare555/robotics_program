@@ -6,10 +6,7 @@ brain=Brain()
 
 # Robot configuration code
 controller_1 = Controller(PRIMARY)
-
 motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
-
-motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)
 
 # wait for rotation sensor to fully initialize
 wait(30, MSEC)
@@ -30,27 +27,22 @@ from vex import *
 # Begin project code
 import math
 
-while True:
+controller_1.screen.clear_screen()
 
-    if motor_1.velocity(RPM) <= -175:
-        controller_1.screen.print("SHOOT") 
-    
-    if controller_1.buttonR1.pressing:
-        motor_2.spin_for(FORWARD, 90, DEGREES)
-        wait(3, SECONDS)
-        motor_2.spin_for(FORWARD, 270, DEGREES)
+controller_1.screen.print("SHOOT") 
+controller_1.rumble(".-.-")
 
-    if controller_1.buttonA.pressing():
-        motor_1.set_velocity(200)
-        motor_1.spin(REVERSE)
-    
-    if controller_1.buttonB.pressing():
-        motor_1.set_velocity(0)
-        motor_1.spin(REVERSE)
+wait(5, SECONDS)
+controller_1.screen.clear_screen()
+
+motor_1.set_velocity(200)
+motor_1.spin(REVERSE)
+
+wait(10, SECONDS)
+temp = motor_1.temperature(PERCENT)
 
     
-    
 
-    wait(1/60,SECONDS)
-    
+print(temp)
+controller_1.screen.print(temp) 
 

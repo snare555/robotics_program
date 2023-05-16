@@ -33,12 +33,14 @@ import math
 while True:
 
     if motor_1.velocity(RPM) <= -175:
-        controller_1.screen.print("SHOOT") 
+        controller_1.screen.print("SHOOT")
+        controller_1.rumble("---") 
+
     
-    if controller_1.buttonR1.pressing:
-        motor_2.spin_for(FORWARD, 90, DEGREES)
-        wait(3, SECONDS)
-        motor_2.spin_for(FORWARD, 270, DEGREES)
+    if controller_1.buttonR1.pressing():
+        motor_2.spin_for(FORWARD, 360, DEGREES)
+        controller_1.screen.clear_screen()
+
 
     if controller_1.buttonA.pressing():
         motor_1.set_velocity(200)
@@ -48,9 +50,9 @@ while True:
         motor_1.set_velocity(0)
         motor_1.spin(REVERSE)
 
-    
-    
+    if controller_1.buttonX.pressing():
+        controller_1.screen.print(motor_1.temperature())
+        wait(5, SECONDS)
+        controller_1.screen.clear_screen()
 
     wait(1/60,SECONDS)
-    
-

@@ -57,6 +57,7 @@ wait(30, MSEC)
 
 while True:
     
+    
     object = vision_1.take_snapshot(vision_1__OBJECT_1)
 
     if object is not None:

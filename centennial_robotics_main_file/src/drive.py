@@ -45,6 +45,7 @@ class Drive():
 
         self.location = (0, 0)
         self.size = ()
+        self.axis = [0, 0, 0, 0]
 
     def control_input(self):
         self.axis[0] = controller_1.axis1.position()
@@ -138,7 +139,7 @@ drive_program = Drive()
 def manual_drive():
     while True:
         drive_program.control_input()
-        drive_program.control_input_modification(axis_2_cf = 2, axis_3_cf=4)
+        drive_program.control_input_modification(axis_3_cf = 2, axis_4_cf = 3)
         drive_program.parallel_input_calculations()
         brain.screen.print(drive_program.input)
         drive_program.motor_speed()
@@ -157,4 +158,4 @@ def automatic_drive():
         brain.screen.clear_screen()
         brain.screen.set_cursor(2,2)
 
-automatic_drive()
+manual_drive()

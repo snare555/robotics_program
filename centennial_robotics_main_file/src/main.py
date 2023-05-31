@@ -1,5 +1,6 @@
 #region VEXcode Generated Robot Configuration
 from vex import *
+import math
 
 # Brain should be defined by default
 brain=Brain()
@@ -27,28 +28,12 @@ motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #Tilt motor L
 
 # wait for rotation sensor to fully initialize
 wait(30, MSEC)
-#endregion VEXcode Generated Robot Configuration
-
-# ------------------------------------------
-#
-#   Project:      VEXcode Project
-#   Author:       VEX
-#   Created:
-#   Description:  VEXcode V5 Python Project
-#
-# ------------------------------------------
-
-# Library imports
-from vex import *
-
-# Begin project code
-import math
 
 
 def shooting():
 
     # If a the shooting motors velocity is under less than or equal to -175RPM
-    if motor_5.velocity(RPM) <= -175:
+    if motor_5.velocity(RPM) <= -120:
 
         # Print that we are shooting
         controller_1.screen.print("SHOOT")
@@ -58,7 +43,7 @@ def shooting():
     # If we press the right bumper, cause the feeding motor to spin
     # pulling the disk on the floor into the launcher
     if controller_1.buttonR1.pressing():
-        motor_6.spin_to_position(-90, DEGREES)
+        motor_6.spin_to_position(-45, DEGREES)
         controller_1.screen.clear_screen()
         wait(1, SECONDS)
         motor_6.spin_to_position(0, DEGREES)
@@ -80,19 +65,19 @@ def shooting():
     if controller_1.buttonUp.pressing():
 
         # If we press up, spin the motors in their respective forward directions
-        motor_7.set_velocity(50)
+        motor_7.set_velocity(10)
         motor_7.spin(FORWARD)
 
-        motor_8.set_velocity(50)
+        motor_8.set_velocity(10)
         motor_8.spin(REVERSE)
     
     elif controller_1.buttonDown.pressing():
 
         # If we press down, spin the motors in their respective reverse directions
-        motor_7.set_velocity(50)
+        motor_7.set_velocity(10)
         motor_7.spin(REVERSE)
 
-        motor_8.set_velocity(50)
+        motor_8.set_velocity(10)
         motor_8.spin(FORWARD)
     
     # This will run if we dont press any of the key buttons
@@ -166,7 +151,8 @@ class Drive():
     def control_input_modification(self, axis_1_cf = 1, axis_2_cf = 1, axis_3_cf = 1, axis_4_cf = 1):
         """
         Curve the magnitude of each controller axis by dividing by 10 and putting it to the power
-        of the respective axis coefficient (axis_num_cf)
+        of the respective axis coefficient (axis_num_cf). This provides finer control at smaller axis 
+        input values while maintaining the speed for larger values
         """
 
         self.input["axis_1"][0] = (self.input["axis_1"][0]/10)**axis_1_cf
@@ -185,14 +171,24 @@ class Drive():
 
         self.speeds = [init_velocity for i in range(4)]
 
+        # if we are moving the joystick forward or backward
         if self.input["axis_1"][0] != 0:
 
+            # Set a rotation variable the velocity of the first axis
             rotation = self.input["axis_1"][0] * self.input["axis_1"][1]
+
+            # increment and decrement the speed array elements for the rear left and right motors to the 
+            # velocity previously calculated rotation
+            self.speeds[0] -= rotation
             self.speeds[1] -= rotation
             self.speeds[2] += rotation
+            self.speeds[3] += rotation
 
     def motor_speed(self):
-
+        """
+        Convert the speed previously calculated into motor velocities
+        and spin the motors
+        """
         motor_1.set_velocity(-self.speeds[0]*2)
         motor_2.set_velocity(-self.speeds[1]*2)
         motor_3.set_velocity(self.speeds[2]*2)
@@ -221,10 +217,17 @@ class Drive():
         its surroundings. This data inckudes the location and size of the object
         the robot is seeking
         """
+
+        # Take the snapshot of the object
         object = vision_1.take_snapshot(vision_1__OBJECT_1)
+
         brain.screen.print("Taking picture")
 
+
+        # If there is a valid object
         if object is not None:
+
+            # Create 2 tuples with the center x and y values of the object as well as the size of the object 
             self.location = (vision_1.largest_object().centerX, vision_1.largest_object().centerY)
 
             self.size = (vision_1.largest_object().width, vision_1.largest_object().height)
@@ -234,21 +237,29 @@ class Drive():
         
         self.vision_data_collect()
 
+        # Joseph you can comment this yourself
         if (self.location[0] * self.location[1]) > 495:
             self.input["axis_3"] = [75, -1]
+
         elif (self.location[0] * self.location[1]) < 473:
             self.input["axis_3"] = [75, 1]
+
         else:
             self.input["axis_3"] = [0, 1]
 
 
 
 drive_program = Drive()
+
 def manual_drive():
+    """
+    Call all the neccesary functions to drive the robot
+    """
     drive_program.control_input()
     drive_program.control_input_modification(axis_1_cf = 2, axis_3_cf = 2)
     drive_program.parallel_input_calculations()
     drive_program.motor_speed()
+
     wait(1/60,SECONDS)
     brain.screen.clear_screen()
     brain.screen.set_cursor(2,2)
@@ -264,14 +275,20 @@ def automatic_drive():
     brain.screen.set_cursor(2,2)
 
 while True:
+
     manual_drive()
     shooting()
 
     controller_1.screen.print(motor_5.velocity(RPM))
+
+    # Display the motor temp when we press x
     if controller_1.buttonX.pressing():
+
         controller_1.screen.print(motor_5.temperature(PERCENT))
         wait(5, SECONDS)
         controller_1.screen.clear_screen()
+
+    # Stop all the motors when we press y
     if controller_1.buttonY.pressing():
         motor_1.stop(mode="Break")
         motor_2.stop(mode="Break")

@@ -1,3 +1,4 @@
+#region VEXcode Generated Robot Configuration
 from vex import *
 import math
 
@@ -36,55 +37,51 @@ wait(30, MSEC)
 def shooting():
 
     # If a the shooting motors velocity is under less than or equal to -175RPM
-    if motor_5.velocity(RPM) <= -120:
+    if motor_5.velocity(RPM) <= -175:
 
         # Print that we are shooting
-        controller_1.rumble("---")
-        
+        controller_1.screen.print("SHOOT")
+        controller_1.rumble("---") 
+
     
     # If we press the right bumper, cause the feeding motor to spin
     # pulling the disk on the floor into the launcher
-    elif controller_1.buttonR1.pressing():
-        motor_6.spin_to_position(-45, DEGREES)
+    if controller_1.buttonR1.pressing():
+        motor_6.spin_to_position(-90, DEGREES)
         controller_1.screen.clear_screen()
         wait(1, SECONDS)
         motor_6.spin_to_position(0, DEGREES)
 
 
     # If we press the A button, set the shooting motors to max velocity to launch the disk
-    elif controller_1.buttonA.pressing():
+    if controller_1.buttonA.pressing():
         motor_5.set_velocity(200)
         motor_5.spin(REVERSE)
     
     # If we press the B button, stop the shooting motor
-    elif controller_1.buttonB.pressing():
+    if controller_1.buttonB.pressing():
         motor_5.set_velocity(0)
         motor_5.spin(REVERSE)
 
-    elif motor_5.velocity != 0:
-        controller_1.screen.set_cursor(0,0)
-        controller_1.screen.print(motor_5.velocity)
-        wait(0.3, SECONDS)
-        controller_1.screen.clear_screen()
 
     # NOTE: Motors 7 and 8 spin in opposite directions
 
     if controller_1.buttonUp.pressing():
 
         # If we press up, spin the motors in their respective forward directions
-        motor_7.set_velocity(5)
+        motor_7.set_velocity(50)
         motor_7.spin(FORWARD)
 
-        motor_8.set_velocity(5)
+        motor_8.set_velocity(50)
         motor_8.spin(REVERSE)
     
     elif controller_1.buttonDown.pressing():
 
         # If we press down, spin the motors in their respective reverse directions
-        motor_7.set_velocity(5)
+        motor_7.set_velocity(50)
         motor_7.spin(REVERSE)
 
-        motor_8.set_velocity(5)
+        motor_8.set_velocity(50)
         motor_8.spin(FORWARD)
     
     # This will run if we dont press any of the key buttons
@@ -92,9 +89,7 @@ def shooting():
         motor_7.stop()
         motor_8.stop()
 
-
-    wait(1/60,SECONDS)
-    
+    wait(1/60, SECONDS)    
 
 class Drive():
 
@@ -194,10 +189,21 @@ class Drive():
         motor_3.set_velocity(self.speeds[2]*2)
         motor_4.set_velocity(self.speeds[3]*2)
 
-        motor_1.spin(REVERSE)
-        motor_2.spin(REVERSE)
-        motor_3.spin(REVERSE)
-        motor_4.spin(REVERSE)
+        motor_1.spin(FORWARD)
+        motor_2.spin(FORWARD)
+        motor_3.spin(FORWARD)
+        motor_4.spin(FORWARD)
+
+    def kill(self):
+        motor_1.set_velocity(0)
+        motor_2.set_velocity(0)
+        motor_3.set_velocity(0)
+        motor_4.set_velocity(0)
+
+        motor_1.spin(FORWARD)
+        motor_2.spin(FORWARD)
+        motor_3.spin(FORWARD)
+        motor_4.spin(FORWARD)
 
 
     def vision_data_collect(self):
@@ -298,9 +304,10 @@ def automatic_drive():
     drive_program.parallel_input_calculations()
     drive_program.motor_speed()
 
-# #Lock piviot motors
-motor_7.set_stopping(HOLD)
-motor_8.set_stopping(HOLD)
+#Lock piviot motors
+# motor_7.set_stopping(HOLD)
+# motor_8.set_stopping(HOLD)
+
 
 while True:
 

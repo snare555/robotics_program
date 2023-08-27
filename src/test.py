@@ -8,7 +8,7 @@ controller_1 = Controller(PRIMARY)
 
 motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
 
-motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_36_1, False)
+motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)
 
 
 # wait for rotation sensor to fully initialize
@@ -31,15 +31,15 @@ while True:
         motor_1.set_velocity(speed, PERCENT)
         motor_1.spin(FORWARD)
         motor_2.set_velocity(speed, PERCENT)
-        motor_2.spin(FORWARD)
+        motor_2.spin(REVERSE)
     elif controller_1.buttonB.pressing():
         motor_1.set_velocity(-speed, PERCENT)
         motor_1.spin(FORWARD)
         motor_2.set_velocity(-speed, PERCENT)
-        motor_2.spin(FORWARD)
+        motor_2.spin(REVERSE)
     else:
-        motor_1.stop(COAST)
-        motor_2.stop(COAST)
+        motor_1.stop(HOLD)
+        motor_2.stop(HOLD)
 
     if controller_1.buttonUp.pressing() and speed < 100:
         speed += 2

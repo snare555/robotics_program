@@ -7,25 +7,25 @@ brain=Brain()
 # Robot configuration code
 controller_1 = Controller(PRIMARY)
 
-motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)  #LEFT DRIVE
+motor_1 = Motor(Ports.PORT19, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE
 
-motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE
+motor_2 = Motor(Ports.PORT17, GearSetting.RATIO_18_1, False)  #LEFT DRIVE
 
-motor_3 = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)  #INTAKE
+motor_3 = Motor(Ports.PORT14, GearSetting.RATIO_18_1, False)  #INTAKE
 
-motor_4 = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)  #SHOOTER
+motor_4 = Motor(Ports.PORT11, GearSetting.RATIO_18_1, False)  #RIGHT PUNCHER
 
-motor_5 = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)  
+motor_5 = Motor(Ports.PORT16, GearSetting.RATIO_18_1, False)  #LEFT PUNCHER
 
-motor_6 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  
+motor_6 = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)  #FLAPS
 
-motor_7 = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)  
+motor_7 = Motor(Ports.PORT20, GearSetting.RATIO_36_1, False)  #RIGHT CLIMBING MOTOR
 
-motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  
+motor_8 = Motor(Ports.PORT18, GearSetting.RATIO_36_1, False)  #LEFT CLIMBING MOTOR
 
 vision_1__SIG_1 = Signature(1, -5269, -4855, -5062,-4995, -4473, -4734,8.8, 0)
 
-vision = Vision(Ports.PORT10, 50, vision_1__SIG_1)
+vision = Vision(Ports.PORT15, 50, vision_1__SIG_1)
 
 
 # wait for rotation sensor to fully initialize
@@ -34,34 +34,55 @@ wait(30, MSEC)
 
 def intake(status = None):
 
-    if controller_1.buttonR1.pressing() or status == "in":  #in
-        motor_3.set_velocity(-200)
+    if controller_1.buttonL1.pressing() or status == "in":  #in
+        motor_3.set_velocity(-100, PERCENT)
         motor_3.spin(FORWARD)
+        controller_1.screen.clear_screen()
+        controller_1.screen.set_cursor(0,0)
+        controller_1.screen.print("intaking")
 
-    elif controller_1.buttonR2.pressing() or status == "out":  #out
-        motor_3.set_velocity(200)
+    elif controller_1.buttonL2.pressing() or status == "out":  #out
+        motor_3.set_velocity(100, PERCENT)
         motor_3.spin(FORWARD)
 
     else:
-        motor_3.stop(COAST)
+        motor_3.stop(HOLD)
 
 def shooting(status = None):
 
-    if controller_1.buttonA.pressing() or status == "single": #Single shot
-        motor_4.set_velocity(200)
-        motor_4.spin_for(FORWARD, 1800, DEGREES)
+    if controller_1.buttonR1.pressing() or status == "single": #Single shot
+        motor_4.set_velocity(60, PERCENT)
+        motor_5.set_velocity(60, PERCENT)
 
-    elif controller_1.buttonB.pressing() or status == "auto":   #Automatic
-        motor_4.set_velocity(200)
-        motor_4.spin(FORWARD)
+        motor_4.spin_for(FORWARD, 360, DEGREES, wait = False)
+        motor_5.spin_for(REVERSE, 360, DEGREES)
 
-    elif controller_1.buttonY.pressing() or status == "reset":   #Return to cocked position
-        motor_4.set_position(0)
+def flaps(status = None):
 
+    if controller_1.buttonRight.pressing() or status == "fout":
+        motor_6.set_velocity(100, PERCENT)
+        motor_6.spin_to_position(200, DEGREES)
+    
+    elif controller_1.buttonLeft.pressing() or status == "fin":
+        motor_6.set_velocity(100, PERCENT)
+        motor_6.spin_to_position(0, DEGREES)
+
+def climbing(speed):
+    if controller_1.buttonUp.pressing():
+        motor_7.set_velocity(speed, PERCENT)
+        motor_7.spin(FORWARD)
+        motor_8.set_velocity(speed, PERCENT)
+        motor_8.spin(REVERSE)
+    elif controller_1.buttonDown.pressing():
+        motor_7.set_velocity(-speed, PERCENT)
+        motor_7.spin(FORWARD)
+        motor_8.set_velocity(-speed, PERCENT)
+        motor_8.spin(REVERSE)
     else:
-        motor_3.stop(COAST)
-
-
+        motor_7.stop(HOLD)
+        motor_8.stop(HOLD)
+    
+    return speed
 
 class Drive():
 
@@ -160,19 +181,19 @@ class Drive():
 
             # increment and decrement the speed array elements for the rear left and right motors to the 
             # velocity previously calculated rotation
-            self.speeds[0] += rotation
-            self.speeds[1] -= rotation
+            self.speeds[0] -= rotation
+            self.speeds[1] += rotation
 
     def motor_speed(self):
         """
         Convert the speed previously calculated into motor velocities
         and spin the motors
         """
-        motor_1.set_velocity(self.speeds[0]*2)
-        motor_2.set_velocity(self.speeds[1]*2)
+        motor_1.set_velocity(self.speeds[0], PERCENT)
+        motor_2.set_velocity(self.speeds[1], PERCENT)
 
-        motor_1.spin(FORWARD)
-        motor_2.spin(REVERSE)
+        motor_1.spin(REVERSE)
+        motor_2.spin(FORWARD)
     
     def drive(self, status = None):
         drive_program.control_input(status)
@@ -187,19 +208,12 @@ class Auto(Drive):
         self.driving_status = [0, 0]  #Decision output for driving, represented in [rotation, speed]
         self.intake_status = ""    #Decision output for the intake
         self.shooting_status = ""   #Decision output for the shooter
-        self.loaded = True  #Status of triball in the shooter
-        self.primed = True  #Status of the shooter position
+        self.loaded = False  #Status of triball in the shooter
         self.triball_location = (0, 0)
         self.triball_size = (0, 0)
 
     def sensor_inputs(self):
         """Take the information from each sensor and motor and organize them"""
-        if motor_4.position == 0:   #add primed position calculation later         %%Not Done%%
-            self.primed = True
-        
-        else:
-            self.primed = False
-
         ##VISION## 
 
         # Take the snapshot
@@ -221,18 +235,28 @@ class Auto(Drive):
     def general_objective(self):
         """Take the sensor input and decide what appropriate action should be taken"""
 
+            #Once the triball have been picked up, stop the intake and declare the robot loaded
+        if (self.triball_location[1]) > 195:
+            self.intake_status = "in"
+            self.loaded = True
+        else:
+            self.loaded = False
+
         if not self.loaded:
+
+
+            self.intake_status = "in"
             
             # If the recognized object is closer to the right side of the vision
             # sensors FOV then upload information to the input dictionary
             # to make the robot slowly rotate move to the right
-            if (self.triball_location[0]) > 190:
-                self.driving_status[0] = 50
+            if (self.triball_location[0]) > 160:
+                self.driving_status[0] = 25
                 controller_1.screen.print("right ")
 
             # Repeat the same code from above but this time with the left side
-            elif (self.triball_location[0]) < 110:
-                self.driving_status[0] = -50
+            elif (self.triball_location[0]) < 140:
+                self.driving_status[0] = -25
                 controller_1.screen.print("left ")
 
             # If the object is in between these margins then do not rotate
@@ -241,37 +265,21 @@ class Auto(Drive):
                 controller_1.screen.print("center ")
 
             # Head towards the triball
-            if (self.triball_size[0] * self.triball_size[1]) < 2600 and (self.triball_size[0] * self.triball_size[1]) > 50:
+            if self.triball_size != (0,0):
                 self.driving_status[1] = 50
-                controller_1.screen.print("forward", self.triball_size)
-            
-            # If the size of the object is larger than 2600 then prime the intake in preperation for tribal contact
-            if (self.triball_size[0] * self.triball_size[1]) > 2600:
-                self.intake_status = "in"
+                controller_1.screen.print("forward", self.triball_size)                
 
-            #Once the triball have been picked up, stop the intake and declare the robot loaded
-            elif (self.triball_size[0] * self.triball_size[1]) > 3600:
-               self.intake_status = ""
-               self.loaded = True
             
-            #if we cant detect the object, rotate and scan
+            #if we cant detect any object, rotate and scan
             elif self.triball_size == (0,0):
+                self.driving_status[1] = 0
                 self.driving_status[0] = 100
             
-        elif self.loaded:   #Aim and shoot
-
-            #Aim the robot (I really don't fucking know how we can do this without an actual field)
-            self.shooting_status = "single"
-
-        # Once the robot have shot the triball, return to priming position
-        if not self.primed:
-            self.shooting_status = "reset"
 
     def decision_output(self):
         """Take the generated decisions and execute them"""
         self.drive(self.driving_status)
-        intake(self.intake_status)
-        shooting(self.shooting_status)
+        intake(status = self.intake_status)
 
     def auto_main(self):
         
@@ -279,35 +287,101 @@ class Auto(Drive):
         self.general_objective()
         self.decision_output()
 
+
+class Recovery():
+    
+    def __init__(self):
+        pass
+    def shooter(self):
+        if controller_1.buttonR1.pressing():
+            motor_4.set_velocity(10, PERCENT)
+            motor_4.spin(FORWARD)
+        elif controller_1.buttonR2.pressing():
+            motor_4.set_velocity(10, PERCENT)
+            motor_4.spin(REVERSE)
+        
+        else:
+            motor_4.stop(HOLD)
+        
+        if controller_1.buttonL1.pressing():
+            motor_5.set_velocity(10, PERCENT)
+            motor_5.spin(FORWARD)
+        elif controller_1.buttonL2.pressing():
+            motor_5.set_velocity(10, PERCENT)
+            motor_5.spin(REVERSE)
+
+        else:
+            motor_5.stop(HOLD)
+
+
+    def flaps(self):
+        if controller_1.buttonLeft.pressing():
+            motor_6.set_velocity(10, PERCENT)
+            motor_6.spin(FORWARD)
+        elif controller_1.buttonRight.pressing():
+            motor_6.set_velocity(10, PERCENT)
+            motor_6.spin(REVERSE)
+        else:
+            motor_6.stop(HOLD)
+    def execute(self):
+        self.flaps()
+        self.shooter()
+
 drive_program = Drive()
 auto_drive = Auto()
+recovery = Recovery()
 
-def display():
-    controller_1.screen.clear_screen()
-    controller_1.screen.set_cursor(0,0)
-    controller_1.screen.clear_screen()
-    controller_1.screen.print("Battery capacity: ", brain.battery.capacity())
-    controller_1.screen.new_line()
+def display(recovery_status):
+    if recovery_status:
+        controller_1.screen.clear_screen()
+        controller_1.screen.set_cursor(0,0)
+        controller_1.screen.print("RECOVERY MODE")
+        controller_1.screen.new_line()
 
-    if drive_program.slow_mode:
-        controller_1.screen.print("Slow mode")
-    elif not drive_program.slow_mode:
-        controller_1.screen.print("Normal mode")
+    elif not recovery_status:
+        controller_1.screen.clear_screen()
+        controller_1.screen.set_cursor(0,0)
+
+        if drive_program.slow_mode:
+            controller_1.screen.print("SLOW MODE")
+        elif not drive_program.slow_mode:
+            controller_1.screen.print("NORMAL MODE")
+        controller_1.screen.new_line()
+
+    controller_1.screen.print("Battery:", brain.battery.capacity(), "%")
+
 
 #Driver
 
+speed = 50
+recovery_mode = False
+# print("STARTING")
 while True:
+    while recovery_mode:
+        recovery.execute()
+        if controller_1.buttonB.pressing():
+            recovery_mode = False
+        display(recovery_mode)
+        wait(1/60, SECONDS)
 
-    drive_program.drive()
-    intake()
-    shooting()
-    display()
-    wait(1/60, SECONDS)
+    while not recovery_mode:
+        drive_program.drive()
+        intake()
+        shooting()
+        flaps() #WORKS
+        speed = climbing(speed) #WORKS
+        if controller_1.buttonB.pressing(): #WORKS
+            recovery_mode = True
+        display(recovery_mode)
+        wait(1/60, SECONDS)
 
 #Automatic
+# motor_3.set_velocity(-100, PERCENT)
+# motor_3.spin(FORWARD)
 
 # while True:
 #     auto_drive.auto_main()
+#     wait(1/60, SECONDS)
+
 #     if controller_1.buttonX.pressing():
 #         break
-

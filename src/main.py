@@ -8,21 +8,21 @@ brain=Brain()
 controller_1 = Controller(PRIMARY)
 
 
-motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)  #FR
+motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE
 
-motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)  #RR
+motor_2 = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)  #LEFT DRIVE
 
-motor_3 = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)  #RL
+motor_3 = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)  #INTAKE
 
-motor_4 = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)  #FL
+motor_4 = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)  #RIGHT PUNCHER
 
-motor_5 = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)  #Shooting motor
+motor_5 = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)  #LEFT PUNCHER
 
-motor_6 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  #Feeding motor
+motor_6 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  #FLAPS
 
-motor_7 = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)  #Tilt motor R
+motor_7 = Motor(Ports.PORT7, GearSetting.RATIO_36_1, False)  #RIGHT CLIMBING MOTOR
 
-motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #Tilt motor L
+motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_36_1, False)  #LEFT CLIMBING MOTOR
 
 vision_1__SIG_1 = Signature(1, -5269, -4855, -5062,-4995, -4473, -4734,8.8, 0)
 
@@ -189,15 +189,11 @@ class Drive():
         Convert the speed previously calculated into motor velocities
         and spin the motors
         """
-        motor_1.set_velocity(-self.speeds[0]*2)
-        motor_2.set_velocity(-self.speeds[1]*2)
-        motor_3.set_velocity(self.speeds[2]*2)
-        motor_4.set_velocity(self.speeds[3]*2)
+        motor_1.set_velocity(-self.speeds[0], PERCENT)
+        motor_2.set_velocity(-self.speeds[1], PERCENT)
 
         motor_1.spin(REVERSE)
         motor_2.spin(REVERSE)
-        motor_3.spin(REVERSE)
-        motor_4.spin(REVERSE)
 
 
     def vision_data_collect(self):

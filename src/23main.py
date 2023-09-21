@@ -61,7 +61,7 @@ def flaps(status = None):
 
     if controller_1.buttonRight.pressing() or status == "fout":
         motor_6.set_velocity(100, PERCENT)
-        motor_6.spin_to_position(200, DEGREES)
+        motor_6.spin_to_position(-200, DEGREES)
     
     elif controller_1.buttonLeft.pressing() or status == "fin":
         motor_6.set_velocity(100, PERCENT)

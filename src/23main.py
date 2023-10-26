@@ -355,8 +355,12 @@ def display(recovery_status):
 
 speed = 50
 recovery_mode = False
+controlled = False
 # print("STARTING")
-while True:
+while controlled == False:
+    motor_3.spin_for(REVERSE, 15, SECONDS)
+    controlled = True
+while controlled == True:
     while recovery_mode:
         recovery.execute()
         if controller_1.buttonB.pressing():

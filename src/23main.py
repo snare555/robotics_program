@@ -19,9 +19,9 @@ motor_5 = Motor(Ports.PORT16, GearSetting.RATIO_18_1, False)  #LEFT PUNCHER
 
 motor_6 = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)  #FLAPS
 
-motor_7 = Motor(Ports.PORT20, GearSetting.RATIO_36_1, False)  #RIGHT CLIMBING MOTOR
+motor_7 = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)  #RIGHT extra drive
 
-motor_8 = Motor(Ports.PORT18, GearSetting.RATIO_36_1, False)  #LEFT CLIMBING MOTOR
+motor_8 = Motor(Ports.PORT18, GearSetting.RATIO_18_1, False)  #LEFT extra drive
 
 vision_1__SIG_1 = Signature(1, -5269, -4855, -5062,-4995, -4473, -4734,8.8, 0)
 
@@ -66,23 +66,6 @@ def flaps(status = None):
     elif controller_1.buttonLeft.pressing() or status == "fin":
         motor_6.set_velocity(100, PERCENT)
         motor_6.spin_to_position(0, DEGREES)
-
-def climbing(speed):
-    if controller_1.buttonUp.pressing():
-        motor_7.set_velocity(speed, PERCENT)
-        motor_7.spin(FORWARD)
-        motor_8.set_velocity(speed, PERCENT)
-        motor_8.spin(REVERSE)
-    elif controller_1.buttonDown.pressing():
-        motor_7.set_velocity(-speed, PERCENT)
-        motor_7.spin(FORWARD)
-        motor_8.set_velocity(-speed, PERCENT)
-        motor_8.spin(REVERSE)
-    else:
-        motor_7.stop(HOLD)
-        motor_8.stop(HOLD)
-    
-    return speed
 
 class Drive():
 
@@ -191,9 +174,13 @@ class Drive():
         """
         motor_1.set_velocity(self.speeds[0], PERCENT)
         motor_2.set_velocity(self.speeds[1], PERCENT)
+        motor_7.set_velocity(self.speeds[0], PERCENT)
+        motor_8.set_velocity(self.speeds[1], PERCENT)
 
         motor_1.spin(REVERSE)
         motor_2.spin(FORWARD)
+        motor_7.spin(REVERSE)
+        motor_8.spin(FORWARD)
     
     def drive(self, status = None):
         drive_program.control_input(status)

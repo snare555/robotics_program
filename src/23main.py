@@ -51,11 +51,26 @@ def intake(status = None):
 def shooting(status = None):
 
     if controller_1.buttonR1.pressing() or status == "single": #Single shot
-        motor_4.set_velocity(60, PERCENT)
-        motor_5.set_velocity(60, PERCENT)
+        motor_4.set_velocity(40, PERCENT)
+        motor_5.set_velocity(40, PERCENT)
 
         motor_4.spin_for(FORWARD, 360, DEGREES, wait = False)
         motor_5.spin_for(REVERSE, 360, DEGREES)
+
+def underpass(status = None):
+    if controller_1.buttonDown.pressing():
+        motor_4.set_velocity(60, PERCENT)
+        motor_5.set_velocity(60, PERCENT)
+
+        motor_4.spin_for(FORWARD, 90, DEGREES, wait = False)
+        motor_5.spin_for(REVERSE, 90, DEGREES)
+
+    if controller_1.buttonUp.pressing():
+        motor_4.set_velocity(60, PERCENT)
+        motor_5.set_velocity(60, PERCENT)
+
+        motor_4.spin_for(FORWARD, -90, DEGREES, wait = False)
+        motor_5.spin_for(REVERSE, -90, DEGREES)
 
 def flaps(status = None):
 
@@ -345,7 +360,7 @@ recovery_mode = False
 controlled = False
 # print("STARTING")
 while controlled == False:
-    motor_3.spin_for(REVERSE, 15, SECONDS)
+    motor_3.spin_for(REVERSE, 1, SECONDS)
     controlled = True
 while controlled == True:
     while recovery_mode:
@@ -360,7 +375,7 @@ while controlled == True:
         intake()
         shooting()
         flaps() #WORKS
-        speed = climbing(speed) #WORKS
+        underpass()
         if controller_1.buttonB.pressing(): #WORKS
             recovery_mode = True
         display(recovery_mode)

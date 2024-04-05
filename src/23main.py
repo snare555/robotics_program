@@ -5,7 +5,7 @@ import math
 brain=Brain()
 
 # Robot configuration code
-controller_1 = Controller(PRIMARY) #test
+controller_1 = Controller(PRIMARY) #test2 test
 
 motor_1 = Motor(Ports.PORT19, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE
 

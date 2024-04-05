@@ -12,7 +12,7 @@
 		"slot": 2,
 		"sdkVersion": "V5_1_0_1_14",
 		"python": {
-			"main": "src/23main.py"
+			"main": "src/24main.py"
 		}
 	}
 }

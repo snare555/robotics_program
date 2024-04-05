@@ -28,7 +28,7 @@ print("\033[2J")
 
 # ------------------------------------------
 # 
-# 	Project: Right Starting
+# 	Project:
 #	Author:
 #	Created:
 #	Configuration:

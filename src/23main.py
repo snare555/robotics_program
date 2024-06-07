@@ -187,10 +187,10 @@ class Drive():
         Convert the speed previously calculated into motor velocities
         and spin the motors
         """
-        motor_1.set_velocity(self.speeds[0], PERCENT)
-        motor_2.set_velocity(self.speeds[1], PERCENT)
-        motor_7.set_velocity(self.speeds[0], PERCENT)
-        motor_8.set_velocity(self.speeds[1], PERCENT)
+        motor_1.set_velocity(self.speeds[0], PERCENT)#right
+        motor_2.set_velocity(self.speeds[1], PERCENT)#left
+        motor_7.set_velocity(self.speeds[0], PERCENT)#right extra
+        motor_8.set_velocity(self.speeds[1], PERCENT)#left extra
 
         motor_1.spin(REVERSE)
         motor_2.spin(FORWARD)
@@ -390,4 +390,4 @@ while controlled == True:
 #     wait(1/60, SECONDS)
 
 #     if controller_1.buttonX.pressing():
-#         break
+#         break Hello 1

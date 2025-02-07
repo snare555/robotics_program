@@ -45,9 +45,9 @@ import math
 
 controller_1 = Controller(PRIMARY) #test  
 
-motor_1 = Motor(Ports.PORT19, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE 
+motor_1 = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE 
 
-motor_2 = Motor(Ports.PORT17, GearSetting.RATIO_18_1, False)  #LEFT DRIVE 
+motor_2 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #LEFT DRIVE 
 
 motor_3 = Motor(Ports.PORT14, GearSetting.RATIO_18_1, False)  #INTAKE 
 
@@ -57,9 +57,9 @@ motor_5 = Motor(Ports.PORT16, GearSetting.RATIO_18_1, False)  #LEFT PUNCHER
 
 motor_6 = Motor(Ports.PORT12, GearSetting.RATIO_36_1, False)  #FLAPS 
 
-motor_7 = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)  #RIGHT extra drive 
+motor_7 = Motor(Ports.PORT9, GearSetting.RATIO_18_1, False)  #RIGHT extra drive 
 
-motor_8 = Motor(Ports.PORT18, GearSetting.RATIO_18_1, False)  #LEFT extra drive 
+motor_8 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  #LEFT extra drive 
 
 
 def pre_autonomous():

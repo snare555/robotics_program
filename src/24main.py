@@ -8,7 +8,7 @@ brain=Brain()
 # Robot configuration code
 motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
 
-
+# hello
 # wait for rotation sensor to fully initialize
 wait(30, MSEC)
 
@@ -108,7 +108,7 @@ def autonomous():
     motor_2.spin_for(FORWARD, .8, TURNS, wait = False) 
     motor_7.spin_for(REVERSE, .8, TURNS, wait = False) 
     motor_8.spin_for(FORWARD, .8, TURNS)
-
+# anything
     wait(2, SECONDS)
     
     motor_1.spin_for(FORWARD, .75, TURNS, wait = False)

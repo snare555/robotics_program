@@ -8,7 +8,7 @@ brain=Brain()
 # Robot configuration code
 motor_1 = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
 
-# hello
+
 # wait for rotation sensor to fully initialize
 wait(30, MSEC)
 
@@ -28,7 +28,7 @@ print("\033[2J")
 
 # ------------------------------------------
 # 
-# 	Project:
+# 	Project: Right Starting
 #	Author:
 #	Created:
 #	Configuration:
@@ -47,7 +47,7 @@ controller_1 = Controller(PRIMARY) #test
 
 motor_1 = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE 
 
-motor_2 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #LEFT DRIVE 
+motor_2 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  #LEFT DRIVE 
 
 motor_3 = Motor(Ports.PORT14, GearSetting.RATIO_18_1, False)  #INTAKE 
 
@@ -59,9 +59,9 @@ motor_6 = Motor(Ports.PORT12, GearSetting.RATIO_36_1, False)  #FLAPS
 
 motor_7 = Motor(Ports.PORT9, GearSetting.RATIO_18_1, False)  #RIGHT extra drive 
 
-motor_8 = Motor(Ports.PORT6, GearSetting.RATIO_18_1, False)  #LEFT extra drive 
+motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #LEFT extra drive 
 
-
+#pablo
 def pre_autonomous():
     # actions to do when the program starts
     brain.screen.clear_screen()
@@ -73,31 +73,31 @@ def autonomous():
     brain.screen.print("right side / match load autonomous code")
     # place automonous code here
 
-    motor_1.set_velocity(30, PERCENT) 
-    motor_2.set_velocity(15, PERCENT) 
-    motor_7.set_velocity(30, PERCENT) 
-    motor_8.set_velocity(15, PERCENT)
+    motor_1.set_velocity(15, PERCENT) 
+    motor_2.set_velocity(30, PERCENT) 
+    motor_7.set_velocity(15, PERCENT) 
+    motor_8.set_velocity(30, PERCENT)
     motor_3.set_velocity(60, PERCENT)
 
-    motor_2.spin_for(FORWARD, 1.25, TURNS, wait = False)
-    motor_8.spin_for(FORWARD, 1.25, TURNS)
+    motor_1.spin_for(REVERSE, 1.25, TURNS, wait = False)
+    motor_7.spin_for(REVERSE, 1.25, TURNS)
 
     motor_1.set_velocity(30, PERCENT) 
     motor_7.set_velocity(30, PERCENT) 
-    motor_1.spin_for(REVERSE, 1.5, TURNS, wait = False) 
-    motor_2.spin_for(FORWARD, 1.5, TURNS, wait = False) 
-    motor_7.spin_for(REVERSE, 1.5, TURNS, wait = False) 
-    motor_8.spin_for(FORWARD, 1.5, TURNS) 
+    motor_1.spin_for(REVERSE, 1.4, TURNS, wait = False) 
+    motor_2.spin_for(FORWARD, 1.4, TURNS, wait = False) 
+    motor_7.spin_for(REVERSE, 1.4, TURNS, wait = False) 
+    motor_8.spin_for(FORWARD, 1.4, TURNS) 
  
     motor_2.set_velocity(15, PERCENT)  
     motor_8.set_velocity(15, PERCENT)
     motor_1.set_velocity(15, PERCENT)  
     motor_7.set_velocity(15, PERCENT)
     
-    motor_1.spin_for(REVERSE, 1, TURNS, wait = False)
-    motor_7.spin_for(REVERSE, 1, TURNS, wait = False)
-    motor_2.spin_for(REVERSE, 0.8, TURNS)
-    motor_8.spin_for(REVERSE, 0.8, TURNS)
+    motor_1.spin_for(FORWARD, .2, TURNS, wait = False)
+    motor_7.spin_for(FORWARD, .2, TURNS, wait = False)
+    motor_2.spin_for(FORWARD, 1, TURNS, wait = False)
+    motor_8.spin_for(FORWARD, 1, TURNS)
 
     motor_2.set_velocity(30, PERCENT)  
     motor_8.set_velocity(30, PERCENT)
@@ -108,11 +108,11 @@ def autonomous():
     motor_2.spin_for(FORWARD, .8, TURNS, wait = False) 
     motor_7.spin_for(REVERSE, .8, TURNS, wait = False) 
     motor_8.spin_for(FORWARD, .8, TURNS)
-# anything
+
     wait(2, SECONDS)
     
-    motor_1.spin_for(FORWARD, .75, TURNS, wait = False)
-    motor_7.spin_for(FORWARD, .75, TURNS)
+    motor_2.spin_for(REVERSE, .75, TURNS, wait = False)
+    motor_8.spin_for(REVERSE, .75, TURNS)
    
 
     motor_2.spin_for(REVERSE, 1.2, TURNS, wait = False)
@@ -120,8 +120,15 @@ def autonomous():
     motor_1.spin_for(FORWARD, 1.2, TURNS, wait = False)
     motor_7.spin_for(FORWARD, 1.2, TURNS)
 
-  
+    motor_2.spin_for(FORWARD, 1.1, TURNS, wait = False)
+    motor_8.spin_for(FORWARD, 1.1, TURNS, wait = False)
+    motor_1.spin_for(FORWARD, 1.1, TURNS, wait = False)
+    motor_7.spin_for(FORWARD, 1.1, TURNS)
 
+    motor_2.spin_for(FORWARD, -0.8, TURNS, wait = False)
+    motor_8.spin_for(FORWARD, -0.8, TURNS, wait = False)
+    motor_1.spin_for(REVERSE, -0.8, TURNS, wait = False)
+    motor_7.spin_for(REVERSE, -0.8, TURNS)
 
 
 def user_control():

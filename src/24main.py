@@ -108,7 +108,7 @@ def autonomous():
     motor_2.spin_for(FORWARD, .8, TURNS, wait = False) 
     motor_7.spin_for(REVERSE, .8, TURNS, wait = False) 
     motor_8.spin_for(FORWARD, .8, TURNS)
-# anything
+# anything jgjgj
     wait(2, SECONDS)
     
     motor_1.spin_for(FORWARD, .75, TURNS, wait = False)

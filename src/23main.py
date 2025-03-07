@@ -6,7 +6,7 @@ brain=Brain()
 
 # Robot configuration code
 controller_1 = Controller(PRIMARY) #test2 test
-
+# Hi 
 motor_1 = Motor(Ports.PORT19, GearSetting.RATIO_18_1, False)  #RIGHT DRIVE
 
 motor_2 = Motor(Ports.PORT17, GearSetting.RATIO_18_1, False)  #LEFT DRIVE

@@ -61,7 +61,7 @@ motor_7 = Motor(Ports.PORT9, GearSetting.RATIO_18_1, False)  #RIGHT extra drive
 
 motor_8 = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)  #LEFT extra drive 
 
-#pablo
+#pablo is this working
 def pre_autonomous():
     # actions to do when the program starts
     brain.screen.clear_screen()

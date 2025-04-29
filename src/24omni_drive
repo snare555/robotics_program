@@ -1,0 +1,80 @@
+def omni_input_calculation(self):
+
+        # Get input signals from the controller and assign them to various variables
+        yaw_control_factor, x_control_factor, y_control_factor = self.control_input()
+
+        # The heading variable is the angle the robot travels at
+
+        # If the left analog stick is moved right
+        # and its either moved up or stays horizontal
+        if x_control_factor > 0 and y_control_factor >= 0:
+            heading = math.atan(y_control_factor/x_control_factor)
+
+        elif x_control_factor < 0 and y_control_factor >= 0:
+            heading = math.pi - math.atan(-y_control_factor/x_control_factor)
+
+        elif x_control_factor < 0 and y_control_factor < 0:
+            heading = math.atan(y_control_factor/x_control_factor) + math.pi
+
+        elif x_control_factor > 0 and y_control_factor < 0:
+            heading = 2 * math.pi - math.atan(-y_control_factor/x_control_factor)
+
+        elif x_control_factor == 0 and y_control_factor >= 0:
+            heading = 0.5 * math.pi
+
+        elif x_control_factor == 0 and y_control_factor < 0:
+            heading = 1.5 * math.pi
+
+        # Set a magnitude variable to whichever analog
+        # input component is greater
+        # (If we move the stick higher up than sideways) set the magnitude
+        # to the vertical component
+
+        if abs(y_control_factor) > abs(x_control_factor):
+            magnitude = abs(y_control_factor)
+        else:
+            magnitude = abs(x_control_factor)
+    
+        x_drive_factor = math.cos(heading - math.pi / 4)
+        y_drive_factor = math.sin(heading - math.pi / 4)
+
+        if abs(x_drive_factor) > abs(y_drive_factor):
+            diff = abs(y_drive_factor / x_drive_factor)
+            x_drive_factor = magnitude * x_drive_factor
+            y_drive_factor = magnitude * diff * y_drive_factor
+    
+        else:
+            diff = abs(x_drive_factor / y_drive_factor)
+            y_drive_factor = magnitude * y_drive_factor
+            x_drive_factor = magnitude * diff * x_drive_factor
+
+        motor_1_speed = y_drive_factor
+        motor_3_speed = - y_drive_factor
+        motor_2_speed = - x_drive_factor
+        motor_4_speed = x_drive_factor
+
+        motor_1_speed += yaw_control_factor
+        if motor_1_speed >= 100:
+            motor_1_speed = 100
+        elif motor_1_speed <= -100:
+            motor_1_speed = -100
+
+        motor_2_speed += yaw_control_factor
+        if motor_2_speed >= 100:
+            motor_2_speed = 100
+        elif motor_2_speed <= -100:
+            motor_2_speed = -100
+
+        motor_3_speed += yaw_control_factor
+        if motor_3_speed >= 100:
+            motor_3_speed = 100
+        elif motor_3_speed <= -100:
+            motor_3_speed = -100
+
+        motor_4_speed += yaw_control_factor
+        if motor_4_speed >= 100:
+            motor_4_speed = 100
+        elif motor_4_speed <= -100:
+            motor_4_speed = -100
+
+        self.speeds = [motor_1_speed, motor_2_speed, motor_3_speed, motor_4_speed, magnitude, heading*180/math.pi, yaw_control_factor]
